@@ -9,7 +9,6 @@ dist/
 *.db
 models-test/
 chinese_whispers.db
-src/models/tokenModels.test.js
 
 # Logs
 *.log
