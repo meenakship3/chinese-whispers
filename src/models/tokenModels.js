@@ -1,4 +1,13 @@
 const db = require('./db');
+const { encrypt, decrypt } = require('../utils/encryption')
+
+require('dotenv').config();
+
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+
+if (!ENCRYPTION_KEY) {
+    throw new Error('ENCRYPTION_KEY not found in environment variables');
+}
 
 function getTokens() {
     return new Promise((resolve, reject) => {
@@ -23,13 +32,45 @@ function getTokens() {
     });
 }
 
+// for viewing, editing and export
+function getTokensById(ids) {
+    return new Promise((resolve, reject) => {
+        if (!ids || ids.length === 0) {
+            resolve([]);
+            return;
+        }
+        const placeholders = ids.map(() => '?').join(',');
+
+        const sql = `SELECT * FROM api_tokens WHERE id IN (${placeholders})`;
+
+        db.all(sql, ids, (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const tokens = rows.map(row => ({
+                id: String(row.id),
+                service: row.service_name,
+                token: row.token_name,
+                value: decrypt(ENCRYPTION_KEY, row.token_value),
+                description: row.description,
+                type: row.token_type,
+                expiryDate: row.expiry_date
+            }));
+            resolve(tokens);
+        })
+    })
+
+}
+
 function updateToken(id, updates) {
     return new Promise((resolve, reject) => {
+        const encryptedValue = encrypt(ENCRYPTION_KEY, updates.tokenValue);
         const sql = `UPDATE api_tokens SET token_name = ?, service_name = ?, token_value = ?, description = ?, token_type = ?, expiry_date = ? WHERE id = ?`;
         const params = [
             updates.tokenName,
             updates.serviceName, 
-            updates.tokenValue, 
+            encryptedValue, 
             updates.description,
             updates.tokenType,
             updates.expiryDate,
@@ -51,11 +92,12 @@ function updateToken(id, updates) {
 
 function addToken(tokenData) {
     return new Promise((resolve, reject) => {
+        const encryptedValue = encrypt(ENCRYPTION_KEY, tokenData.tokenValue);
         const sql = `INSERT INTO api_tokens(token_name, service_name, token_value, description, token_type, expiry_date) VALUES (?, ?, ?, ?, ?, ?)`;
         const params = [
             tokenData.tokenName,
             tokenData.serviceName,
-            tokenData.tokenValue,
+            encryptedValue,
             tokenData.description,
             tokenData.tokenType,
             tokenData.expiryDate
@@ -92,6 +134,7 @@ function deleteToken(id) {
 
 module.exports = {
     getTokens,
+    getTokensById,
     updateToken,
     addToken,
     deleteToken

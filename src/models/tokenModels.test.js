@@ -9,7 +9,7 @@ describe('token crud operations', () => {
             try {
                 await tokenModel.deleteToken(id);
             } catch(err) {
-                // ignore
+                console.log("All clean already!", err)
             }
         }
         console.log("Cleanup complete!")    
