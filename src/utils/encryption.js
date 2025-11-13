@@ -16,19 +16,34 @@ const encrypt = (key, plaintext) => {
 }
 
 const decrypt = (key, combinedString) => {
-    const [iv, ciphertext, tag] = combinedString.split(":");
-   const decipher = crypto.createDecipheriv(
-    "aes-256-gcm", 
-    Buffer.from(key, 'base64'),
-    Buffer.from(iv, 'base64')
-  );
-  
-  decipher.setAuthTag(Buffer.from(tag, 'base64'));
+    // Add validation
+    if (!combinedString || typeof combinedString !== 'string') {
+        throw new Error('Invalid encrypted data: combinedString is required');
+    }
 
-  let plaintext = decipher.update(ciphertext, 'base64', 'utf8');
-  plaintext += decipher.final('utf8');
+    const parts = combinedString.split(":");
+    if (parts.length !== 3) {
+        throw new Error(`Invalid encrypted format: expected 3 parts, got ${parts.length}`);
+    }
 
-  return plaintext;
+    const [iv, ciphertext, tag] = parts;
+
+    if (!iv || !ciphertext || !tag) {
+        throw new Error('Invalid encrypted data: missing iv, ciphertext, or tag');
+    }
+
+    const decipher = crypto.createDecipheriv(
+        "aes-256-gcm",
+        Buffer.from(key, 'base64'),
+        Buffer.from(iv, 'base64')
+    );
+
+    decipher.setAuthTag(Buffer.from(tag, 'base64'));
+
+    let plaintext = decipher.update(ciphertext, 'base64', 'utf8');
+    plaintext += decipher.final('utf8');
+
+    return plaintext;
 }
 
 module.exports = {

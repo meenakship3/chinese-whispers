@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const tokenModel = require('../models/tokenModels');
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -21,6 +22,51 @@ function createWindow() {
         win.loadFile(path.join(__dirname, '../renderer/index.html'));
     }
 }
+
+ipcMain.handle('tokens:getAll', async () => {
+    try {
+        return await tokenModel.getTokens();
+    } catch (error) {
+        console.error('Error getting tokens');
+        throw error;
+    }
+})
+
+ipcMain.handle('tokens:getById', async (event, ids) => {
+    try {
+        return await tokenModel.getTokensById(ids);
+    } catch (error) {
+        console.error('Error getting token(s) by ID', error);
+        throw error;
+    }
+})
+
+ipcMain.handle('tokens:update', async (event, id, updates) => {
+    try {
+        return await tokenModel.updateToken(id, updates);
+    } catch (error) {
+        console.error('Error updating token', error);
+        throw error;
+    }
+})
+
+ipcMain.handle('tokens:add', async (event, tokenData) => {
+    try {
+        return await tokenModel.addToken(tokenData);
+    } catch (error) {
+        console.error('Error adding token', error);
+        throw error;
+    }
+})
+
+ipcMain.handle('tokens:delete', async (event, id) => {
+    try {
+        return await tokenModel.deleteToken(id);
+    } catch (error) {
+        console.error('Error deleting token', error);
+        throw error;
+    }
+})
 
 app.whenReady().then(() => {
     // Handle file save dialog

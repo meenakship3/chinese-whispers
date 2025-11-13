@@ -9,5 +9,9 @@ export default defineConfig([
   { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
-  { rules: {'@typescript-eslint/no-require-imports': 'off'} }
+  { rules: {
+    '@typescript-eslint/no-require-imports': 'off',
+    'react/react-in-jsx-scope': 'off'
+  } }
+
 ]);

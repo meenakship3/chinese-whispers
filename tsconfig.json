@@ -26,6 +26,6 @@
       "@/*": ["./src/renderer/*"]
     }
   },
-  "include": ["src/renderer/**/*", "src/main/**/*"],
+  "include": ["src/renderer/**/*", "src/main/**/*, src/renderer/**/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
