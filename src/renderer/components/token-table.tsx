@@ -13,23 +13,23 @@ import {
 } from '@/components/ui/table';
 import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface TokenTableProps {
   tokens: Token[];
   onEdit: (token: Token) => void;
   onDelete: (ids: string[]) => void;
   onSelectionChange?: (selectedIds: string[]) => void;
+  getDecryptedTokens: (ids: string[]) => Promise<Token[]>
 }
 
-export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange }: TokenTableProps) {
+export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange, getDecryptedTokens }: TokenTableProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [visibleTokens, setVisibleTokens] = useState<Set<string>>(new Set());
+  const [decryptedValues, setDecryptedValues] = useState<Map<string, string>>(new Map())
 
-  const maskToken = (value: string): string => {
-    if (value.length <= 8) return '••••••••';
-    const start = value.slice(0, 4);
-    const end = value.slice(-4);
-    return `${start}${'•'.repeat(value.length - 8)}${end}`;
+  const maskToken = (): string => {
+    return `${"•".repeat(15)}`;
   };
 
   const getTokenStatus = (expiryDate?: string): 'active' | 'expiring' | 'expired' => {
@@ -66,11 +66,24 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange }: Toke
     onSelectionChange?.(Array.from(newSelected));
   };
 
-  const toggleTokenVisibility = (id: string) => {
+  const toggleTokenVisibility = async (id: string) => {
     const newVisible = new Set(visibleTokens);
     if (newVisible.has(id)) {
       newVisible.delete(id);
     } else {
+      if (!decryptedValues.has(id)) {
+        try {
+          const decryptedTokens = await getDecryptedTokens([id])
+          if (decryptedTokens.length > 0) {
+            const newDecrypted = new Map(decryptedValues);
+            newDecrypted.set(id, decryptedTokens[0].value);
+            setDecryptedValues(newDecrypted);
+          }
+        } catch (error) {
+          console.error('Failed to decrypt token:', error);
+          return;
+        }
+      }
       newVisible.add(id);
     }
     setVisibleTokens(newVisible);
@@ -162,9 +175,18 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange }: Toke
                     <TableCell>{token.token}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <code className="text-xs font-mono bg-neutral-100 px-2 py-1 rounded">
-                          {isVisible ? token.value : maskToken(token.value)}
-                        </code>
+                        <button
+                          onClick={() => {
+                            const value = decryptedValues.get(token.id);
+                            if (isVisible && value) {
+                              navigator.clipboard.writeText(value);
+                              toast.success('Token copied to clipboard!');
+                            }
+                          }}
+                          className="text-xs font-mono bg-neutral-100 px-2 py-1 rounded hover:bg-neutral-200 transition-colors w-[126px] truncate text-left">
+                            {isVisible ? (decryptedValues.get(token.id) || maskToken()) 
+                                       : maskToken()}
+                        </button>
                         <Button
                           size="sm"
                           variant="ghost"

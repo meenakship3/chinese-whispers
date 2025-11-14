@@ -4,7 +4,7 @@ node_modules/
 package-lock.json
 npm-debug.log*
 .env
-
+todo.md 
 # Build artifacts
 dist/
 *.db

@@ -8,7 +8,7 @@ import { Plus, Download, RefreshCw, ShieldCheck, HardDrive } from 'lucide-react'
 import { Token } from '@/types/electron';
 
 function App() {
-  const { tokens, loading, error, loadTokens, deleteToken } = useTokens();
+  const { tokens, loading, error, loadTokens, deleteToken, getDecryptedTokens } = useTokens();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [selectedToken, setSelectedToken] = useState<Token | undefined>();
@@ -144,6 +144,10 @@ function App() {
             tokens={tokens}
             onEdit={handleEditToken}
             onDelete={handleDeleteTokens}
+            getDecryptedTokens={async (ids) => {
+              const result = await getDecryptedTokens(ids);
+              return result || [];
+            }}
           />
         </div>
       </section>
