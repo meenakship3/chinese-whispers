@@ -11,7 +11,7 @@ if (!ENCRYPTION_KEY) {
 
 function getTokens() {
     return new Promise((resolve, reject) => {
-        const sql = "SELECT * FROM api_tokens";
+        const sql = "SELECT * FROM api_tokens ORDER BY id DESC";
         db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err);

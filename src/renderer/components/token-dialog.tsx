@@ -16,9 +16,10 @@ interface TokenDialogProps {
   onOpenChange: (open: boolean) => void;
   mode: 'add' | 'edit';
   tokenData?: Token;
+  onSuccess?: () => void;
 }
 
-export function TokenDialog({ open, onOpenChange, mode, tokenData }: TokenDialogProps) {
+export function TokenDialog({ open, onOpenChange, mode, tokenData, onSuccess }: TokenDialogProps) {
   const { addToken, updateToken, getDecryptedTokens } = useTokens();
   const [decryptedToken, setDecryptedToken] = useState<Token | undefined>();
   const [loading, setLoading] = useState(false);
@@ -47,12 +48,16 @@ export function TokenDialog({ open, onOpenChange, mode, tokenData }: TokenDialog
     try {
       if (mode === 'add') {
         await addToken(formData);
-        toast.success('Token added successfully!');
       } else if (mode === 'edit' && tokenData) {
         await updateToken(tokenData.id, formData);
-        toast.success('Token updated successfully!');
       }
       onOpenChange(false);
+      onSuccess?.();
+
+      // Show toast after dialog closes to prevent unmounting issues
+      setTimeout(() => {
+        toast.success(mode === 'add' ? 'Token added successfully!' : 'Token updated successfully!');
+      }, 100);
     } catch (error) {
       toast.error(`Failed to ${mode} token: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

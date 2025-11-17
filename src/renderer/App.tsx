@@ -12,6 +12,26 @@ function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [selectedToken, setSelectedToken] = useState<Token | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const tokensPerPage = 10;
+
+  // Calculate pagination
+  const totalPages = Math.ceil(tokens.length / tokensPerPage);
+  const startIndex = (currentPage - 1) * tokensPerPage;
+  const endIndex = startIndex + tokensPerPage;
+  const paginatedTokens = tokens.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   const handleAddToken = () => {
     setDialogMode('add');
@@ -141,7 +161,7 @@ function App() {
         {/* Token Table */}
         <div className="bg-white/95 backdrop-blur-sm border border-neutral-200 rounded-lg shadow-sm overflow-hidden">
           <TokenTable
-            tokens={tokens}
+            tokens={paginatedTokens}
             onEdit={handleEditToken}
             onDelete={handleDeleteTokens}
             getDecryptedTokens={async (ids) => {
@@ -150,6 +170,38 @@ function App() {
             }}
           />
         </div>
+
+        {/* Pagination Controls */}
+        {tokens.length > tokensPerPage && (
+          <div className="mt-4 flex items-center justify-between bg-white/90 backdrop-blur-sm border border-neutral-200 rounded-lg p-4">
+            <div className="text-sm text-neutral-600 font-mono">
+              Showing {startIndex + 1}-{Math.min(endIndex, tokens.length)} of {tokens.length} tokens
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="font-mono"
+              >
+                &lt;
+              </Button>
+              <span className="text-sm text-neutral-600 font-mono px-3">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="font-mono"
+              >
+                &gt;
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Add/Edit Dialog */}
@@ -158,6 +210,7 @@ function App() {
         onOpenChange={setDialogOpen}
         mode={dialogMode}
         tokenData={selectedToken}
+        onSuccess={loadTokens}
       />
     </main>
   );

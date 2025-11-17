@@ -45,7 +45,7 @@ export function useTokens() {
             if (err instanceof Error) {
                 setError(err.message);
                 throw err;
-            }   
+            }
         }
     }
 

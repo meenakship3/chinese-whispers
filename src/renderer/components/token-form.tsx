@@ -122,13 +122,12 @@ export function TokenForm({ mode, initialData, onSubmit, onCancel }: TokenFormPr
       {/* Token Value */}
       <div className="space-y-2">
         <Label htmlFor="tokenValue">Token Value *</Label>
-        <Textarea
+        <Input
           id="tokenValue"
           value={formData.tokenValue}
           onChange={(e) => handleChange('tokenValue', e.target.value)}
           placeholder="Paste your token here..."
           className={errors.tokenValue ? 'border-red-500' : ''}
-          rows={3}
         />
         {errors.tokenValue && (
           <p className="text-sm text-red-500">{errors.tokenValue}</p>
@@ -139,6 +138,7 @@ export function TokenForm({ mode, initialData, onSubmit, onCancel }: TokenFormPr
       <div className="space-y-2">
         <Label htmlFor="tokenType">Token Type *</Label>
         <Select
+          key={formData.tokenType}
           value={formData.tokenType}
           onValueChange={(value) => handleChange('tokenType', value)}
         >

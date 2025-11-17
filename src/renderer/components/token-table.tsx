@@ -11,9 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Pencil, Trash2, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface TokenTableProps {
   tokens: Token[];
@@ -143,7 +148,6 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange, getDec
               <TableHead>Service</TableHead>
               <TableHead>Token Name</TableHead>
               <TableHead>Value</TableHead>
-              <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Expiry</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -152,7 +156,7 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange, getDec
           <TableBody>
             {tokens.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-neutral-500 py-8">
+                <TableCell colSpan={7} className="text-center text-neutral-500 py-8">
                   No tokens found. Add your first token to get started.
                 </TableCell>
               </TableRow>
@@ -172,7 +176,35 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange, getDec
                       />
                     </TableCell>
                     <TableCell className="font-medium">{token.service}</TableCell>
-                    <TableCell>{token.token}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate">{token.token}</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="text-neutral-400 hover:text-neutral-600 transition-colors flex-shrink-0">
+                              <Info className="w-4 h-4" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-3">
+                              <div>
+                                <h4 className="font-semibold text-sm mb-1">Token Type</h4>
+                                <Badge variant="outline">{token.type}</Badge>
+                              </div>
+                              {token.description && (
+                                <div>
+                                  <h4 className="font-semibold text-sm mb-1">Description</h4>
+                                  <p className="text-sm text-neutral-600">{token.description}</p>
+                                </div>
+                              )}
+                              {!token.description && (
+                                <p className="text-sm text-neutral-400 italic">No description provided</p>
+                              )}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <button
@@ -183,7 +215,7 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange, getDec
                               toast.success('Token copied to clipboard!');
                             }
                           }}
-                          className="text-xs font-mono bg-neutral-100 px-2 py-1 rounded hover:bg-neutral-200 transition-colors w-[126px] truncate text-left">
+                          className="text-xs font-mono bg-neutral-100 px-2 py-1 rounded hover:bg-neutral-200 transition-colors w-[15vw] min-w-[127px] max-w-[127px] truncate text-left">
                             {isVisible ? (decryptedValues.get(token.id) || maskToken()) 
                                        : maskToken()}
                         </button>
@@ -199,9 +231,6 @@ export function TokenTable({ tokens, onEdit, onDelete, onSelectionChange, getDec
                           )}
                         </Button>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{token.type}</Badge>
                     </TableCell>
                     <TableCell>{getStatusBadge(status)}</TableCell>
                     <TableCell>
