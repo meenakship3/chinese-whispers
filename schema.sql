@@ -10,7 +10,6 @@ CREATE TABLE api_tokens (
     expiry_date DATETIME,
     is_active BOOLEAN DEFAULT 1
 );
-CREATE TABLE sqlite_sequence(name,seq);
 CREATE TABLE notification_settings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     token_id INTEGER NOT NULL,
@@ -25,7 +24,7 @@ CREATE TABLE notification_history (
     notification_type TEXT CHECK(notification_type IN ('EXPIRY_WARNING', 'EXPIRED', 'CUSTOM')),
     sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     message TEXT,
-    was_acknowledged BOOLEAN DEFAULT 0, days_before_expiry INTEGER, notification_category TEXT CHECK(notification_category IN ('SEVEN_DAYS', 'ONE_DAY', 'EXPIRED')),
+    was_acknowledged BOOLEAN DEFAULT 0, days_before_expiry INTEGER, notification_category TEXT CHECK(notification_category IN ('SEVEN_DAYS', 'ONE_DAY', 'EXPIRED')), notification_message TEXT,
     FOREIGN KEY (token_id) REFERENCES api_tokens(id) ON DELETE CASCADE
 );
 CREATE TABLE tags (

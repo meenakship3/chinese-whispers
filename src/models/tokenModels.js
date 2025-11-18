@@ -76,8 +76,12 @@ function updateToken(id, updates) {
             fields.push('token_name = ?');
             params.push(updates.tokenName);
         }
-        if (updates.tokenValue) {
-            const encryptedValue = encrypt(updates.tokenValue, ENCRYPTION_KEY);
+        if (updates.tokenValue !== undefined) {
+            if (updates.tokenValue === null) {
+                reject(new Error('Token value cannot be null'));
+                return;
+            }
+            const encryptedValue = encrypt(ENCRYPTION_KEY, updates.tokenValue);
             fields.push('token_value = ?');
             params.push(encryptedValue);
         }
@@ -101,6 +105,11 @@ function updateToken(id, updates) {
         db.run(sql, params, function(err) {
             if (err) {
                 reject(err);
+                return;
+            }
+
+            if (this.changes === 0) {
+                reject(new Error(`Token with id ${id} not found`));
                 return;
             }
 

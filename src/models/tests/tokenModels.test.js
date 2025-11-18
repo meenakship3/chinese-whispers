@@ -1,4 +1,4 @@
-const tokenModel = require('./tokenModels');
+const tokenModel = require('../tokenModels');
 
 describe('token crud operations', () => {
     const createdTokenIds = [];
@@ -318,7 +318,7 @@ describe('integration tests', () => {
 
             const newToken = await tokenModel.addToken(testData);
             createdTokenIds.push(newToken.id);
-            const rawDb = require('./db');
+            const rawDb = require('../db');
 
             const row = await new Promise((resolve, reject) => {
                 rawDb.get('SELECT token_value FROM api_tokens WHERE id = ?', [newToken.id], (err, row) => {

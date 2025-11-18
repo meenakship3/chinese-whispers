@@ -5,8 +5,6 @@ package-lock.json
 npm-debug.log*
 .env
 todo.md
-.github
-TESTING.md
 
 # Test coverage
 coverage/

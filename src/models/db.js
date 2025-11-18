@@ -9,7 +9,7 @@ const dbPath = path.join(__dirname, '../../chinese_whispers.db')
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error("Database connection failed", err);
-    } else {
+    } else if (process.env.NODE_ENV !== 'test') {
         console.log("Database connected successfully");
     }
 });
