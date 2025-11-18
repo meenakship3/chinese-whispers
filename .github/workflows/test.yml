@@ -1,4 +1,4 @@
-name: Cross-Platform Notification Support
+name: Cross-Platform Notification Tests
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
-  notification-support:
-    name: Check Notifications on ${{ matrix.os }}
+  notification-tests:
+    name: Notification Tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -31,5 +31,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check Electron notification support
-        run: node -e "const {Notification} = require('electron'); console.log('Platform:', process.platform); console.log('Notification.isSupported():', Notification.isSupported());"
+      - name: Run notification unit tests
+        run: npm run test:notifications
+        env:
+          CI: true
