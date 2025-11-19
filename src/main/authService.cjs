@@ -1,6 +1,7 @@
 const authModel = require('../models/authModel');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const path = require('path');
 
 const execAsync = promisify(exec);
 
@@ -45,16 +46,17 @@ async function authenticateWithTouchID() {
     }
 
     try {
-        const script = `
-            set dialogText to "EnvVault wants to unlock using Touch ID"
-            do shell script "echo 'Authenticated'" with administrator privileges with prompt dialogText
-        `;
-
-        await execAsync(`osascript -e '${script.replace(/'/g, "'\\''")}'`);
-        isAuthenticated = true;
-        return true;
+        const pythonScript = path.join(__dirname, 'touchid_auth.py');
+        const { stdout } = await execAsync(`python3 "${pythonScript}"`);
+        
+        if (stdout.trim() === 'SUCCESS') {
+            isAuthenticated = true;
+            return true;
+        } else {
+            throw new Error('Authentication failed');
+        }
     } catch {
-        throw new Error('Touch ID failed or was cancelled');
+        throw new Error('Touch ID authentication failed or was cancelled');
     }
 }
 
