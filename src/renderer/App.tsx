@@ -10,12 +10,6 @@ import { Token } from '@/types/electron';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { tokens, loading, error, loadTokens, deleteToken, getDecryptedTokens } = useTokens();
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-  const [selectedToken, setSelectedToken] = useState<Token | undefined>();
-  const [currentPage, setCurrentPage] = useState(1);
-  const tokensPerPage = 10;
 
   if (!isAuthenticated) {
     return (
@@ -25,6 +19,17 @@ function App() {
       </>
     );
   }
+
+  return <AuthenticatedApp />;
+}
+
+function AuthenticatedApp() {
+  const { tokens, loading, error, loadTokens, deleteToken, getDecryptedTokens } = useTokens();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+  const [selectedToken, setSelectedToken] = useState<Token | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const tokensPerPage = 10;
   
   // Calculate pagination
   const totalPages = Math.ceil(tokens.length / tokensPerPage);

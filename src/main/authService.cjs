@@ -6,17 +6,17 @@ function checkIfSetup() {
     return authModel.isPasswordSetup();
 }
 
-function setup(password) {
+async function setup(password) {
     if (!password || password.length < 4) {
         throw new Error('Password must be atleast 4 characters');
     }
-    authModel.setupPassword(password);
+    await authModel.setupPassword(password);
     isAuthenticated = true;
     return true;
 }
 
-function verify(password) {
-    const isValid = authModel.verifyPassword(password);
+async function verify(password) {
+    const isValid = await authModel.verifyPassword(password);
     if (isValid) {
         isAuthenticated = true;
     }

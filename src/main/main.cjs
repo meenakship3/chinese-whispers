@@ -89,13 +89,14 @@ ipcMain.handle('tokens:delete', async (event, id) => {
 })
 
 // Auth handlers
-ipcMain.handle('auth:isSetup', () => {
-    return authService.checkIfSetup();
+ipcMain.handle('auth:isSetup', async () => {
+    return await authService.checkIfSetup();
 });
 
 ipcMain.handle('auth:setup', async (event, password) => {
     try {
-        return { success: authService.setup(password) };
+        await authService.setup(password);
+        return { success: true };
     } catch (error) {
         return { success: false, error: error.message };
     }
@@ -103,7 +104,7 @@ ipcMain.handle('auth:setup', async (event, password) => {
 
 ipcMain.handle('auth:verify', async (event, password) => {
     try {
-        const isValid = authService.verify(password);
+        const isValid = await authService.verify(password);
         return { success: isValid };
     } catch (error) {
         return { success: false, error: error.message };

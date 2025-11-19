@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { KeyRound, Lock } from 'lucide-react';
+import { KeyRound, Lock, Eye, EyeOff } from 'lucide-react';
 
 interface LoginScreenProps {
   onAuthenticated: () => void;
@@ -17,6 +17,8 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     checkSetup();
@@ -112,7 +114,16 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-50">
-      <Card className="w-[420px]">
+        <div
+            aria-hidden="true"
+            className="pointer-events-none fixed inset-0 opacity-[0.06]"
+            style={{
+            background:
+                "repeating-linear-gradient(0deg, #000, #000 1px, transparent 1px, transparent 3px), radial-gradient(1000px 500px at 50% -20%, #0f172a 0%, transparent 60%)",
+            mixBlendMode: "multiply",
+            }}
+        />
+      <Card className="w-[420px] bg-white relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             {isSetup ? (
@@ -137,16 +148,30 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
               <Label htmlFor="password">
                 {isSetup ? 'Password' : 'Master Password'} *
               </Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => handlePasswordChange(e.target.value)}
-                placeholder={isSetup ? 'Enter your password' : 'Create a strong password'}
-                className={errors.password ? 'border-red-500' : ''}
-                autoFocus
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  placeholder={isSetup ? 'Enter your password' : 'Create a strong password'}
+                  className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                  autoFocus
+                  disabled={isSubmitting}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isSubmitting}
+                >
+                  {showPassword ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-sm text-red-500">{errors.password}</p>
               )}
@@ -156,15 +181,29 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
             {!isSetup && (
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password *</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-                  placeholder="Re-enter your password"
-                  className={errors.confirmPassword ? 'border-red-500' : ''}
-                  disabled={isSubmitting}
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => handleConfirmPasswordChange(e.target.value)}
+                    placeholder="Re-enter your password"
+                    className={errors.confirmPassword ? 'border-red-500 pr-10' : 'pr-10'}
+                    disabled={isSubmitting}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    disabled={isSubmitting}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
                 {errors.confirmPassword && (
                   <p className="text-sm text-red-500">{errors.confirmPassword}</p>
                 )}
