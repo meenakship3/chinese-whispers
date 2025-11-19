@@ -14,7 +14,7 @@ coverage/
 dist/
 *.db
 models-test/
-chinese_whispers.db
+lockbox.db
 
 # Logs
 *.log

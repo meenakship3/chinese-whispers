@@ -1,4 +1,4 @@
-# Testing Guide for Chinese Whispers
+# Testing Guide for Lockbox
 
 This guide covers how to test the notification system across different platforms.
 
@@ -111,7 +111,7 @@ npm run dev
 
 **macOS:**
 
-- Check System Settings → Notifications → "Chinese Whispers" or "Electron"
+- Check System Settings → Notifications → "Lockbox" or "Electron"
 - Ensure notifications are set to "Alerts" (not Banners)
 - Turn off Do Not Disturb/Focus mode
 - Notifications should appear in the top-right corner
@@ -119,7 +119,7 @@ npm run dev
 **Windows:**
 
 - Check Settings → System → Notifications
-- Ensure "Chinese Whispers" has notifications enabled
+- Ensure "Lockbox" has notifications enabled
 - Notifications appear in the Action Center
 
 **Linux:**
@@ -172,7 +172,7 @@ Every push to `main` or `develop` triggers tests on:
 
 1. Go to your GitHub repo
 2. Click **Actions** tab
-3. Select **Cross-Platform Tests** workflow
+3. Select **Cross-Platform Notification Tests** workflow
 4. Click **Run workflow** button
 5. Select branch and click **Run workflow**
 
@@ -180,16 +180,10 @@ Every push to `main` or `develop` triggers tests on:
 
 1. Go to **Actions** tab
 2. Click on the workflow run
-3. View test results for each OS:
-
-   - `Test on ubuntu-latest`
-   - `Test on windows-latest`
-   - `Test on macos-latest`
-
-4. Check notification-specific tests:
-   - `Notification System Test on ubuntu-latest`
-   - `Notification System Test on windows-latest`
-   - `Notification System Test on macos-latest`
+3. Check notification-specific tests:
+   - `Notification Tests on ubuntu-latest`
+   - `Notification Tests on windows-latest`
+   - `Notification Tests on macos-latest`
 
 ---
 
@@ -451,22 +445,3 @@ npm test
 ```
 
 ---
-
-## Contributing
-
-When adding new notification features:
-
-1. ✅ Write unit tests first (TDD)
-2. ✅ Update this testing guide
-3. ✅ Test on at least 2 platforms locally
-4. ✅ Ensure CI/CD passes on all 3 platforms
-5. ✅ Update coverage requirements if needed
-
----
-
-## Resources
-
-- [Electron Notifications Documentation](https://www.electronjs.org/docs/latest/tutorial/notifications)
-- [macOS Notification Guidelines](https://developer.apple.com/design/human-interface-guidelines/notifications)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Jest Testing Framework](https://jestjs.io/)

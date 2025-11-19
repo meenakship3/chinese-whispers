@@ -1,10 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { app } = require('electron');
 
-// For development
-const dbPath = path.join(__dirname, '../../chinese_whispers.db')
-// For production
-// const dbPath = path.join(app.getPath('userData'), 'chinese_whispers.db')
+// Use different database paths for development vs production
+const dbPath = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+    ? path.join(__dirname, '../../lockbox.db')  // Development: project root
+    : path.join(app.getPath('userData'), 'lockbox.db');  // Production: user data directory
 
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
