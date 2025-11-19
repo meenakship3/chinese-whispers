@@ -1,4 +1,8 @@
 const authModel = require('../models/authModel');
+const { exec } = require('child_process');
+const { promisify } = require('util');
+
+const execAsync = promisify(exec);
 
 let isAuthenticated = false;
 
@@ -31,10 +35,35 @@ function lock() {
     isAuthenticated = false;
 }
 
+function isTouchIDAvailable() {
+    return process.platform === 'darwin';
+}
+
+async function authenticateWithTouchID() {
+    if (!isTouchIDAvailable()) {
+        throw new Error('Touch ID is not available on this platform');
+    }
+
+    try {
+        const script = `
+            set dialogText to "EnvVault wants to unlock using Touch ID"
+            do shell script "echo 'Authenticated'" with administrator privileges with prompt dialogText
+        `;
+
+        await execAsync(`osascript -e '${script.replace(/'/g, "'\\''")}'`);
+        isAuthenticated = true;
+        return true;
+    } catch {
+        throw new Error('Touch ID failed or was cancelled');
+    }
+}
+
 module.exports = {
     checkIfSetup,
     setup,
     verify,
     isUserAuthenticated,
-    lock
+    lock,
+    isTouchIDAvailable,
+    authenticateWithTouchID
 };

@@ -111,6 +111,20 @@ ipcMain.handle('auth:verify', async (event, password) => {
     }
 });
 
+// Touch ID handlers
+ipcMain.handle('auth:isTouchIDAvailable', () => {
+    return authService.isTouchIDAvailable();
+});
+
+ipcMain.handle('auth:authenticateWithTouchID', async () => {
+    try {
+        await authService.authenticateWithTouchID();
+        return { success: true }
+    } catch (error) {
+        return { success: false, error: error.message }
+    }
+});
+
 
 app.whenReady().then(() => {
     // Handle file save dialog

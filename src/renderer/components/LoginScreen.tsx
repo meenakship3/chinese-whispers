@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { KeyRound, Lock, Eye, EyeOff } from 'lucide-react';
+import { KeyRound, Lock, Eye, EyeOff, Fingerprint } from 'lucide-react';
 
 interface LoginScreenProps {
   onAuthenticated: () => void;
@@ -19,9 +19,11 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isTouchIDAvailable, setIsTouchIDAvailable] = useState(false);
 
   useEffect(() => {
     checkSetup();
+    checkTouchID();
   }, []);
 
   async function checkSetup() {
@@ -33,6 +35,32 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
       console.error('Setup check error:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function checkTouchID() {
+    try {
+      const available = await window.api.auth.isTouchIDAvailable();
+      setIsTouchIDAvailable(available);
+    } catch (error) {
+      console.error('Touch ID check error:', error);
+    }
+  }
+
+  async function handleTouchID() {
+    setIsSubmitting(true);
+    try {
+      const result = await window.api.auth.authenticateWithTouchID();
+      if (result.success) {
+        onAuthenticated();
+      } else {
+        toast.error(result.error || 'Touch ID authentication failed');
+      }
+    } catch (error) {
+      toast.error('Touch ID authentication failed');
+      console.error('Touch ID error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -143,6 +171,33 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Touch ID Button (only show on login, not setup) */}
+            {isSetup && isTouchIDAvailable && (
+              <Button
+                type="button"
+                onClick={handleTouchID}
+                disabled={isSubmitting}
+                className="w-full bg-gray-900 hover:bg-gray-800"
+              >
+                <Fingerprint className="w-4 h-4 mr-2" />
+                Unlock with Touch ID
+              </Button>
+            )}
+
+            {/* Divider (only show if Touch ID is available on login) */}
+            {isSetup && isTouchIDAvailable && (
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-muted-foreground">
+                    Or continue with password
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Password Field */}
             <div className="space-y-2">
               <Label htmlFor="password">
@@ -156,7 +211,7 @@ export function LoginScreen({ onAuthenticated }: LoginScreenProps) {
                   onChange={(e) => handlePasswordChange(e.target.value)}
                   placeholder={isSetup ? 'Enter your password' : 'Create a strong password'}
                   className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
-                  autoFocus
+                  autoFocus={!isTouchIDAvailable}
                   disabled={isSubmitting}
                 />
                 <button
