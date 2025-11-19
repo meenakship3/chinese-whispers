@@ -1,6 +1,6 @@
 # Lockbox
 
-> A secure desktop application for managing API keys and tokens with military-grade encryption, biometric authentication, and smart expiry notifications.
+A secure desktop application for managing API keys and tokens with military-grade encryption, biometric authentication, and smart expiry notifications.
 
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=github-actions&logoColor=white)](https://github.com)
 [![Tests](https://img.shields.io/badge/Coverage-70%25%2B-success)](https://github.com)
@@ -14,6 +14,10 @@
 - **Export Tokens** - Export to Bash or .env format for easy integration with development projects
 - **SQL Injection Prevention** - Parameterized queries throughout the application
 - **Auto-lock Security** - Automatically locks after 15 minutes of inactivity
+
+## In Action
+![ScreenRecording2025-11-19at9 35 51_PM-ezgif com-cut](https://github.com/user-attachments/assets/262cde4b-130b-44c3-a55d-50bea3d74758)
+
 
 ## Tech Stack
 
@@ -54,7 +58,12 @@
    npm install
    ```
 
-3. **Set up encryption key**
+3. **Initialize the database**
+   ```bash
+   sqlite3 lockbox.db < schema.sql
+   ```
+
+4. **Set up encryption key**
    ```bash
    # run src/utils/generate/generateKey.js to generate your key
    # save the key to .env
@@ -67,10 +76,6 @@ npm run dev
 ```
 
 This starts the Vite dev server and launches Electron with DevTools enabled.
-
-## License
-
-ISC
 
 ## Author
 
