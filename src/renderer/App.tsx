@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { LoginScreen } from './components/LoginScreen';
 import { useTokens } from '@/hooks/useTokens';
 import { TokenTable } from '@/components/token-table';
 import { TokenDialog } from '@/components/token-dialog';
@@ -8,6 +9,7 @@ import { Plus, Download, RefreshCw, ShieldCheck, HardDrive } from 'lucide-react'
 import { Token } from '@/types/electron';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { tokens, loading, error, loadTokens, deleteToken, getDecryptedTokens } = useTokens();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
@@ -15,6 +17,15 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const tokensPerPage = 10;
 
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Toaster />
+        <LoginScreen onAuthenticated={() => setIsAuthenticated(true)} />
+      </>
+    );
+  }
+  
   // Calculate pagination
   const totalPages = Math.ceil(tokens.length / tokensPerPage);
   const startIndex = (currentPage - 1) * tokensPerPage;

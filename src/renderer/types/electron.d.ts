@@ -17,6 +17,11 @@ export interface TokenData {
     expiryDate?: string;
 }
 
+export interface AuthResult {
+    success: boolean;
+    error?: string;
+}
+
 export interface IElectronAPI {
     tokens: {
         getAll: () => Promise<Token[]>;
@@ -24,6 +29,11 @@ export interface IElectronAPI {
         add: (tokenData: TokenData) => Promise<Token>;
         update: (id: string, updates: TokenData) => Promise<Token>;
         delete: (id: string) => Promise<{ deleted: boolean; id: string }>;
+    };
+    auth: {
+        isSetup: () => Promise<boolean>;
+        setup: (password: string) => Promise<AuthResult>;
+        verify: (password: string) => Promise<AuthResult>;
     };
 }
 
