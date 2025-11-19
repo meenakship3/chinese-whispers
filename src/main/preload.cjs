@@ -12,5 +12,10 @@ contextBridge.exposeInMainWorld("api", {
         update: (id, updates) => ipcRenderer.invoke('tokens:update', id, updates),
         add: (tokenData) => ipcRenderer.invoke('tokens:add', tokenData),
         delete: (id) => ipcRenderer.invoke('tokens:delete', id)
+    },
+    auth: {
+        isSetup: () => ipcRenderer.invoke('auth:isSetup'),
+        setup: (password) => ipcRenderer.invoke('auth:setup', password),
+        verify: (password) => ipcRenderer.invoke('auth:verify', password)
     }
 });

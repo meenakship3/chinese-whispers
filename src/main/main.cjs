@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const tokenModel = require('../models/tokenModels');
 const notificationService = require('./notificationService.cjs');
+const authService = require('./authService.cjs');
 
 // Set app name for notifications (important for macOS)
 app.name = 'Chinese Whispers';
@@ -28,6 +29,9 @@ function createWindow() {
 }
 
 ipcMain.handle('tokens:getAll', async () => {
+    if (!authService.isUserAuthenticated()) {
+        throw new Error('Not authenticated');
+    }
     try {
         return await tokenModel.getTokens();
     } catch (error) {
@@ -37,6 +41,9 @@ ipcMain.handle('tokens:getAll', async () => {
 })
 
 ipcMain.handle('tokens:getById', async (event, ids) => {
+    if (!authService.isUserAuthenticated()) {
+        throw new Error('Not authenticated');
+    }
     try {
         return await tokenModel.getTokensById(ids);
     } catch (error) {
@@ -46,6 +53,9 @@ ipcMain.handle('tokens:getById', async (event, ids) => {
 })
 
 ipcMain.handle('tokens:update', async (event, id, updates) => {
+    if (!authService.isUserAuthenticated()) {
+        throw new Error('Not authenticated');
+    }
     try {
         return await tokenModel.updateToken(id, updates);
     } catch (error) {
@@ -55,6 +65,9 @@ ipcMain.handle('tokens:update', async (event, id, updates) => {
 })
 
 ipcMain.handle('tokens:add', async (event, tokenData) => {
+    if (!authService.isUserAuthenticated()) {
+        throw new Error('Not authenticated');
+    }
     try {
         return await tokenModel.addToken(tokenData);
     } catch (error) {
@@ -64,6 +77,9 @@ ipcMain.handle('tokens:add', async (event, tokenData) => {
 })
 
 ipcMain.handle('tokens:delete', async (event, id) => {
+    if (!authService.isUserAuthenticated()) {
+        throw new Error('Not authenticated');
+    }
     try {
         return await tokenModel.deleteToken(id);
     } catch (error) {
@@ -72,12 +88,28 @@ ipcMain.handle('tokens:delete', async (event, id) => {
     }
 })
 
-// const NOTIFICATION_TITLE = 'Basic Notification'
-// const NOTIFICATION_BODY = 'Notification from the Main process'
+// Auth handlers
+ipcMain.handle('auth:isSetup', () => {
+    return authService.checkIfSetup();
+});
 
-// function showNotification () {
-//   new Notification({ title: NOTIFICATION_TITLE, body: NOTIFICATION_BODY }).show()
-// }
+ipcMain.handle('auth:setup', async (event, password) => {
+    try {
+        return { success: authService.setup(password) };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('auth:verify', async (event, password) => {
+    try {
+        const isValid = authService.verify(password);
+        return { success: isValid };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
 
 app.whenReady().then(() => {
     // Handle file save dialog
@@ -97,7 +129,6 @@ app.whenReady().then(() => {
     });
 
     createWindow();
-    // showNotification();
     notificationService.startNotificationScheduler();
 
     app.on('activate', () => {
